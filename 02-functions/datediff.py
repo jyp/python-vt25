@@ -1,9 +1,13 @@
-# how old am i (in number of days)
-# what is the number of days between two arbitrary dates (in the Gregorian calendar)
+# Problem: how old am i (in number of days)?
+# Generalisation: what is the number of days between two arbitrary dates (in the Gregorian calendar)?
+
+# a date is a triple (year,month,day)
 
 number_of_days_per_year = 365.2422
-number_of_days_per_month = 30.5
-def date_diff_approx(y1,m1,d1, y2,m2,d2 ):
+number_of_days_per_month = 30.5 # approximate average
+def date_diff_approx(date1, date2):
+    (y1,m1,d1) = date1
+    (y2,m2,d2) = date2
     return (y2-y1)* number_of_days_per_year + (m2-m1) * number_of_days_per_month + (d2-d1)
 
 # input("date?")
@@ -44,7 +48,8 @@ def number_of_days_in_year(y):
     else:
         return 365
 
-def days_from_epoch(y,m,d):
+def days_from_epoch(date):
+    (y,m,d) = date
     days = 0
     for year in range(1,y):
         days = days + number_of_days_in_year(year)
@@ -53,11 +58,11 @@ def days_from_epoch(y,m,d):
     days = days + d
     return days
 
-def date_diff(y1,m1,d1, y2,m2,d2):
-    return days_from_epoch(y2,m2,d2) - days_from_epoch(y1,m1,d1)
+def date_diff(date1, date2):
+    return days_from_epoch(date2) - days_from_epoch(date1)
 
 # print("test one year:", date_diff(2024,1,27 ,2025,1,27))
 # print("test one month:", date_diff(2025,1,27 ,2025,2,27))
 # print("test one month: ", date_diff(2024,12,27 ,2025,1,27))
 
-# print(date_diff(1978,12,15 ,2025,1,27))
+print(date_diff_approx((1978,12,15) , (2025,1,27)))
