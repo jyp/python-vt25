@@ -1,0 +1,196 @@
+* Types
+** Types as Sets
+Types are a tool to structure values.
+You're used to values being considered as members of sets.
+
+- 7 ∈ ℕ
+- π ∈ ℝ
+- (x ↦ x²)  ∈  ℝ → ℝ
+
+- In python:
+  - types are not sets of values. Rather, every value is assigned a type.
+  - types are themselves values
+
+** Types in python
+
+In python:
+ - you can use the ~type~ function to get the type of a value.
+ - you can test the type of value ~v~ as follows:
+
+#+begin_src python
+  if type(v) is my_type:
+      ...
+#+end_src
+
+- Livecoding: examples
+- What is the type of functions?
+- What is the type of types?
+
+** Structural Typing
+
+- In Python the validity of a method call (or any operation) is
+  checked at the very last possible moment: just at the point of the
+  call.
+- Consequently, in the absence of explicit type-checks, python has
+  *structural typing*.
+- That is, only the *structure* of a class (its methods) matter when
+  it comes to determine which code can use it.
+
+We have taken advantage of this behaviour before, with vectors.
+Consider the expression ~u + v~. It works for ~u~ and ~v~ being ints.
+But because defined the method ~__add__~ for vectors, then the same
+expression works for *vectors* ~u~ and ~v~.
+
+** Dynamic Typing
+
+In python, the existence of a method is only checked at the very last
+moment: just before it will be run.
+
++ One says that python is *dynamically typed*
+
+** Duck Typing
+
+Structural dynamic typing is often called "duck typing", in reference to the saying:
+
+#+begin_quote
+If it looks like a duck, swims like a duck, and quacks like a duck,
+then it probably is a duck.
+#+end_quote
+
+In python:
+
+#+begin_src python
+  class Duck:
+    def walk(self): print("walk walk")
+    def swim(self): print("swim swim")
+    def quack(self): print("quack quack")
+
+  class Swan:
+    def swim(self): print("swim gracefully")
+    def walk(self): print("walk awkwardly")
+    def quack(self): print("quack insufferably")
+#+end_src
+
+... every program that works for Duck will work for Swan too...
+
++ unless you have an explicit test:
+
+#+begin_src 
+assert(type(value) is Duck)
+#+end_src
+
+*** Pitfalls with "duck typing"
+
+It is not always clear from the outset on which types a function will work.
+
+Example:
+ - Assume ~l~ is a list of vectors.
+ - Then you can expect that ~sum(l)~ will compute their sum.
+ - Unfortunately, the ~sum~ function first starts with a zero value which is, by default the integer 0.
+  - So it won't work. (But ~sum(l,start=Vec(0,0))~ will work.)
+
+* Static typing
+
+- Unfortunately, dynamic typing means that one must run the program to discover typing errors.
+  - And it "feels like" one should be able to discover typing errors
+    just by "thinking about" the program, without actually running it.
+  - This is impossible in general! [Result is related to the halting problem]
+
+- There are static type-checkers for python:
+  - They check for type errors *without running the program*
+  - They are only approximate: some correct programs flagged as having
+    errors, and some type errors are not detected.
+  - Understanding the type-system can be challenging
+** Beyond Python
+
+- Some programming languages are designed in such a way that types can
+  always be checked statically.
+  - But not python.
+  - By using type information, the program can be run more efficiently
+  - They are more complicated to design
+  - Understanding the type-system can be challenging (but less so than
+    Python's, which is an overgrown wart.)
+
+** Type annotations in Python
+
+- The programmer can help the type checker by writing type
+  annotations. Then the approximations can get better.
+- Type annotations are also useful as documentation
+- They are *ignored at runtime*
+
+** Type annotation Examples
+
+Type annotations on variables:
+#+begin_src python
+x : int = 5
+#+end_src
+
+Type annotations on functions:
+
+#+begin_src python
+def greeting(name: str) -> str:
+    return 'Hello ' + name
+
+def print_greeting(name: str) -> None:
+    print('Hello ' + name)
+#+end_src
+
+** Parametric Type annotations
+
+Some types (like lists) are parametric: they are types that take another type as parameter.
+
+#+begin_src python
+y : list[int] = [1,2,3]
+t : list[float] = [4,2.0,3]
+#+end_src
+
+* IDE support
+
+- The type ckecker that I use is called: *pyright*
+- Emacs: I use eglot + eldoc-doc-buffer
+- VS Code:
+  - The Python & PyLance extensions have type checking off by default,
+    enable in the PyLance extension settings by setting the
+  “Type Checking Mode” to basic or strict.
+
+* More on polymorphism
+** Inclusion Polymorphism
+
+*** Math:
+- ℕ ⊆ ℝ
+- ℚ ⊆ ℝ
+
+*** Python typechecker:
+- int ⊆ float (?!)
+- list ⊆ Sized
+- str ⊆ Sized
+- dict ⊆ Sized
+- tuple ⊆ Sized
+  
+*** Why?
+This is useful because we can have functions working on every sized objects, such as:
+
+len : (v : Sized) -> int
+
+*** Example
+From Zelle's graphics.py library:
+Circle ⊂ Oval ⊂ _BBox ⊂ GraphicsObject
+
+every GraphicsObject can be:
+- drawn
+- moved
+etc.
+
+**** Theoretical Point of View
+  - if A ⊆ B and x ∈ A then x ∈ B
+  - if (∀x. x ∈ A → x ∈ B) then A ⊆ B
+  - If every program that works on objects of class A also works on objects of class B, then A ⊆ B
+    - conversely, if we have a declaration A ⊆ B then every program that works on A must also work on B.
+    - (Liskov substitution principle)
+  - Vocabulary:
+    - A is a subtype of B
+    - B is a supertype of A
+
+** Parametric Polymorphism
+
+file:poly.py
